@@ -11,7 +11,7 @@ exports.getMovies = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-    Movies.fetchAll(movies => {
+    Movie.fetchAll(movies => {
         res.render('shop/index', {
             movs: movies,
             pageTitle: 'Shop',
