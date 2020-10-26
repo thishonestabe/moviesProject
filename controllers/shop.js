@@ -10,6 +10,15 @@ exports.getMovies = (req, res, next) => {
     });
 };
 
+exports.getMovie = (req, res, next) => {
+    const movId = req.params.movieId;
+    console.log(movId)
+    Movie.findById(movId, movie => {
+        res.render('shop/movie-detail', {movie: movie, pageTitle: movie.title, path: "/movies"});
+    })
+
+}
+
 exports.getIndex = (req, res, next) => {
     Movie.fetchAll(movies => {
         res.render('shop/index', {
@@ -26,6 +35,11 @@ exports.getCart = (req, res, next) => {
         pageTitle: 'Your Cart'
     });
 };
+
+exports.postCart = (req, res, next) => {
+    const movId = req.body.movieId;
+    res.redirect('/cart')
+}
 
 exports.getOrders = (req, res, next) => {
     res.render('shop/orders', {

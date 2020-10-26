@@ -26,6 +26,7 @@ module.exports = class Movie {
     }
 
     save() {
+        this.id = Math.random().toString();
         getMoviesFromFile(movies => {
             movies.push(this);
             fs.writeFile(p, JSON.stringify(movies), err => {
@@ -36,5 +37,12 @@ module.exports = class Movie {
 
     static fetchAll(cb) {
         getMoviesFromFile(cb);
+    }
+
+    static findById(id, cb) {
+        getMoviesFromFile(movies => {
+            const movie = movies.find(m => m.id === id);
+            cb(movie)
+        })
     }
 };
