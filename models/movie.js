@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const Cart = require('./cart');
+
 const p = path.join(
     path.dirname(process.mainModule.filename),
     'data',
@@ -18,7 +20,8 @@ const getMoviesFromFile = cb => {
 };
 
 module.exports = class Movie {
-    constructor(title, imageUrl, description, price) {
+    constructor(id, title, imageUrl, description, price) {
+        this.id = id;
         this.title = title;
         this.imageUrl = imageUrl;
         this.description = description;
@@ -26,13 +29,40 @@ module.exports = class Movie {
     }
 
     save() {
-        this.id = Math.random().toString();
+
+
         getMoviesFromFile(movies => {
-            movies.push(this);
-            fs.writeFile(p, JSON.stringify(movies), err => {
-                console.log(err);
-            });
+            if (this.id) {
+                const existingMovieIndex = movies.findIndex(m => m.id === this.id);
+                const updatedMovies = [...movies];
+                updatedMovies[existingMovieIndex] = this;
+                fs.writeFile(p, JSON.stringify(updatedMovies), err => {
+                    console.log(err);
+                });
+            } else {
+                this.id = Math.random().toString();
+                movies.push(this);
+                fs.writeFile(p, JSON.stringify(movies), err => {
+                    console.log(err);
+                });
+            }
+
         });
+    }
+
+    static deleteById(id) {
+        getMoviesFromFile(movies => {
+            const movie = movies.find(m => m.id === id)
+            const updatedMovies = movies.filter(m => m.id !== id);
+            fs.writeFile(p, JSON.stringify(updatedMovies), err => {
+                if(!err) {
+                    Cart.deleteMovie(id, movie.price);
+                }
+
+            })
+
+        })
+
     }
 
     static fetchAll(cb) {

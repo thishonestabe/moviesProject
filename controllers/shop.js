@@ -1,4 +1,5 @@
 const Movie = require('../models/movie');
+const Cart = require('../models/cart');
 
 exports.getMovies = (req, res, next) => {
     Movie.fetchAll(movies => {
@@ -30,15 +31,42 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-    res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart'
-    });
+    Cart.getCart(cart => {
+        Movie.fetchAll(movies => {
+            const cartMovies = []
+            for (let movie of movies) {
+                const cartMovieData = cart.movies.find(m => m.id === movie.id)
+                if(cartMovieData) {
+                    cartMovies.push({movieData: movie, qty: cartMovieData.qty});
+                }
+            }
+            res.render('shop/cart', {
+                path: '/cart',
+                pageTitle: 'Your Cart',
+                movies: cartMovies
+            });
+        })
+
+    })
+
 };
 
 exports.postCart = (req, res, next) => {
     const movId = req.body.movieId;
+    console.log(movId);
+    Movie.findById(movId, (movie) => {
+        Cart.addMovie(movId, movie.price)
+    })
     res.redirect('/cart')
+}
+
+exports.postCartDeleteMovie = (req, res, next) => {
+    const movId = req.body.movieId;
+    Movie.findById(movId, movie => {
+        Cart.deleteMovie(movId, movie.price);
+        res.redirect('/cart');
+    })
+
 }
 
 exports.getOrders = (req, res, next) => {

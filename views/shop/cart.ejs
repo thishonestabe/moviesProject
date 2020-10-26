@@ -3,4 +3,21 @@
 
 <body>
 <%- include('../includes/navigation.ejs') %>
+<main>
+    <%if (movies.length > 0) { %>
+        <ul>
+            <% movies.forEach(m => {%>
+                 <li>
+                     <p><%= m.movieData.title %> (<%= m.qty %>)</p>
+                     <form action="/cart-delete-movie" method="POST">
+                         <input type="hidden" value="<%= m.movieData.id %>" name="movieId">
+                         <button class="btn" type="submit">Delete</button>
+                     </form>
+                 </li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <h1>No Movies in Cart!</h1>
+    <% } %>
+</main>
 <%- include('../includes/end.ejs') %>
